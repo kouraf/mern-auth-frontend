@@ -1,25 +1,37 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
+import { useCookies } from 'react-cookie';
+import { Switch, Route } from 'react-router-dom';
+import LoginUserRoute from './components/LoginUserRoute';
+import UserContext from "./context/UserContext";
+import NavBar from './components/NavBar';
+import Home from './components/Home';
+import Login from './components/Login';
+import Register from './components/Register';
 import './App.css';
 
 function App() {
+  const [userData, setUserData] = useState({
+    token: null,
+    user: {}
+  });
+  const [cookies, setCookie] = useCookies(['userData']);
+
+  useEffect(() => {
+    const coo = cookies.userData;
+    if (coo) {
+      setUserData(coo);
+    }
+  }, [userData])
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <UserContext.Provider value={{ userData, setUserData }}>
+      <NavBar />
+      <Switch>
+        <Route exact path='/' component={Home} />
+        <LoginUserRoute path='/login' component={Login} />
+        <LoginUserRoute path='/register' component={Register} />
+        <Route component={Home} />
+      </Switch>
+    </UserContext.Provider>
   );
 }
 
